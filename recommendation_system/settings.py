@@ -27,7 +27,7 @@ SECRET_KEY = 'jw-9+j_@!05t8%c^_$8regjmor(43@o6bduqovxpqg*&f5z@k&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['rrsystem.herokuapp.com']
+ALLOWED_HOSTS = ['rrsystem.herokuapp.com', '127.0.0.1']
 
 
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'recommender.apps.RecommenderConfig'
 ]
 
 MIDDLEWARE = [
@@ -125,11 +126,10 @@ STATIC_URL = '/static/'
 
 
 # heroku
-PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(BASE_DIR, 'static'),
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
