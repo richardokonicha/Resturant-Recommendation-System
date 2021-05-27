@@ -1,0 +1,21 @@
+{% extends "recommender/index.html" %}
+{% block content %}
+  <form method="POST" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="form-control">
+      <p>{{ form.username.errors }}</p>
+      <p>{{ form.username.label_tag }}
+        {{ form.username }}
+      </p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.password.errors }}</p>
+      <p>{{ form.password.label_tag }}
+        {{ form.password }}
+      </p>
+    </div>
+    <input type="submit" value="Login" />
+    <input type="hidden" name="next" value="{{ next }}" />
+  </form>
+  <p><a href="{% url 'password_reset' %}">Forgot your password?</a><p>
+{% endblock %}

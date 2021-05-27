@@ -1,0 +1,34 @@
+{% extends "recommender/index.html" %}
+
+{% block content %}
+  <form method="POST" action="{% url 'recommender:sign_up' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="form-control">
+      <p>{{ form.username.errors }}</p><p>
+      <p>{{ form.username.label_tag }}
+        {{ form.username }}
+      </p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.email.errors }}</p>
+      <p>{{ form.email.label_tag }}
+        {{ form.email }}
+      </p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.password1.errors }}</p>
+      <p>{{ form.password1.label_tag }}
+        {{ form.password1 }}
+      </p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.password2.errors }}</p>
+      <p>{{ form.password2.label_tag }}
+        {{ form.password2 }}
+      </p>
+    </div>
+    <input type="submit" value="Sign up">
+  </form>
+  <p>Already have an account? <a href="{% url 'login' %}">Login</p>
+{% endblock %}

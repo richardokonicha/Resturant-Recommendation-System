@@ -15,10 +15,10 @@
             <i class="fas fa-bars"></i>
             <!-- <i class="fas fa-thumbs-up fa-5x"></i> -->
         </span>
-        <a href="#" class="logo"><img src="{% static 'img/amara.jpg' %}" alt="logo" class="profile-img"></a>
+        <a href="{% url 'recommender:index' %}" class="logo"><img src="{% static 'img/amara.jpg' %}" alt="logo" class="profile-img"></a>
         <ul class="main-nav" id="js-menu">
             <li>
-                <a href="#" class="nav-link">Home</a>
+                <a href="{% url 'recommender:index' %}" class="nav-link">Home</a>
             </li>
             <li>
                 <a href="#" class="nav-link">Menu</a>
@@ -32,10 +32,31 @@
             <li>
                 <a href="" class="nav-link">About</a>
             </li>
+            {% if user.is_authenticated %}
+              <li>
+                <a href="#" class="nav-link">{{ user.get_username }}</a>
+              </li>
+              <li>
+                <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+              </li>
+            {% else %}
+              <li>
+                <a
+                  class="nav-link"
+                  href="{% url 'login' %}?next={% if next %}{{ next }}{% else %}{{ request.path }}{% endif %}">
+                  Login
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'recommender:sign_up' %}" class="nav-link">Sign Up</a>
+              </li>
+            {% endif %}
         </ul>
     </nav>
-
-   
+    <div id="content">
+      {% block content %}
+      {% endblock %}
+    </div>
 </body>
 
 <script>
