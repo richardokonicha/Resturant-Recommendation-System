@@ -1,0 +1,28 @@
+{% extends "recommender/index.html" %}
+
+{% block content %}
+  {% if restaurants %}
+    <table>
+      <thead>
+        <tr>
+          <th>Restaurant</th>
+          <th>Address</th>
+          <th>Rating</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+    </table>
+    <tbody>
+      {% for restaurant in restaurants %}
+        <tr>
+          <td>{{ restaurant.name }}</td>
+          <td>{{ restaurant.address }}</td>
+          <td>{% if restaurant.rating %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
+          <td><a href="{{ restaurant.get_absolute_url }}">Explore</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  {% else %}
+    <p>No restaurants created yet.</p>
+  {% endif %}
+{% endblock %}
