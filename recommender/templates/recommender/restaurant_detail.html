@@ -1,0 +1,42 @@
+{% extends "recommender/index.html" %}
+{% load static %}
+
+{% block content %}
+  <div class="restaurant-meta">
+    <h2>{{ restaurant.name }}</h2>
+    <span>
+        {{ restaurant.address }}
+        {% if restaurant.longitude and restaurant.latitude %}
+          {{ restaurant.latitude }}, {{ restaurant.longitude }}
+        {% endif %}
+    </span><br />
+    <span>Rating: {% if restaurant.rating %}{{ restaurant.rating }} of 5{% else %}N/A{% endif %}</span>
+      <p>
+        <img
+          width="400"
+          src="{% if restaurant.image_url %}{{ restaurant.image_url }}{% else %}{% static 'img/business.png' %}{% endif %}"
+        />
+      </p>
+  </div>
+  <hr>
+  <h3>Top Dishes at {{ restaurant.name }}</h3>
+  <div class="restaurant-dishes">
+    {% for dish in highest_rated_dishes %}
+      <div>
+        <a href="{{ dish.get_absolute_url }}">
+          <img
+            width="250"
+            src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
+          /><br />
+          {{ dish.name }}<br />
+          <span>Rating: {% if dish.rating %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span><br />
+          <span>&#36;{{ dish.price }}</span>
+        </a>
+      </div>
+      {% empty %}
+        <p>
+          No dishes yet for {{ restaurant.name }}.
+        </p>
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "recommender/index.html" %}
+{% load static %}
+{% block content %}
+  {% if dishes %}
+    <table>
+      <thead>
+        <tr>
+          <th>Dish</th>
+          <th>Price</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dish in dishes %}
+          <tr>
+            <td>
+              <a href="{{ dish.get_absolute_url }}">
+                <img
+                  height="70"
+                  src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
+                />
+                <span>{{ dish.name }}</span>
+            </td>
+            <td>&#36;{{ dish.price }}</td>
+            <td>{% if dish.rating %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No available dishes yet.</p>
+  {% endif %}
+{% endblock %}
