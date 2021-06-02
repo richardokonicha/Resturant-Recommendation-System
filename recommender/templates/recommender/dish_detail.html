@@ -1,0 +1,18 @@
+{% extends "recommender/index.html" %}
+{% load static %}
+{% block content %}
+  <div class="dish-meta">
+    <h2>{{ dish.name }}</h2>
+    <span>
+      From: <a href="{{ dish.restaurant.get_absolute_url }}">{{ dish.restaurant.name }}</a>
+    </span><br />
+    <span>Rating: {% if dish.rating %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span>
+      <p>
+        <img
+          width="500"
+          src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
+        />
+      </p>
+      <span>&#36;{{ dish.price }}</span>
+  </div>
+{% endblock %}
