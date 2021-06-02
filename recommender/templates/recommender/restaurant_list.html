@@ -11,17 +11,17 @@
           <th>&nbsp;</th>
         </tr>
       </thead>
+      <tbody>
+        {% for restaurant in restaurants %}
+          <tr>
+            <td>{{ restaurant.name }}</td>
+            <td>{{ restaurant.address }}</td>
+            <td>{% if restaurant.rating %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
+            <td><a href="{{ restaurant.get_absolute_url }}">Explore</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
     </table>
-    <tbody>
-      {% for restaurant in restaurants %}
-        <tr>
-          <td>{{ restaurant.name }}</td>
-          <td>{{ restaurant.address }}</td>
-          <td>{% if restaurant.rating %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
-          <td><a href="{{ restaurant.get_absolute_url }}">Explore</a></td>
-        </tr>
-      {% endfor %}
-    </tbody>
   {% else %}
     <p>No restaurants created yet.</p>
   {% endif %}
