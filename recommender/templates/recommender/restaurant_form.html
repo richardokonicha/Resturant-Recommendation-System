@@ -1,0 +1,30 @@
+{% extends "recommender/index.html" %}
+
+{% block content %}
+  <h2>{% if update %}Update{% else %}Create{% endif %} Restaurant </h2>
+  <form method="post" action="">
+    {% csrf_token %}
+    <div class="form-control">
+      <p>{{ form.name.errors }}</p>
+      <p>{{ form.name.label_tag }} {{ form.name }}</p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.address.errors }}</p>
+      <p>{{ form.address.label_tag }} {{ form.address }}</p>
+    </div>
+    <div class="form-control">
+      <p>{{ form.image_url.errors }}</p>
+      <p>{{ form.image_url.label_tag }}<span class="form-info">(optional)</span> {{ form.image_url }}</p>
+    </div>
+    <div class="form-control">
+      {% if form.lattitude.errors %}<p>{{ form.latitude.errors }}</p>{% endif %}
+      {% if form.longitude.errors %}<p>{{ form.longitude.errors }}</p>{% endif %}
+      <p>{{ form.latitude.label_tag }} {{ form.latitude }} {{ form.longitude.label_tag }} {{ form.longitude }}</p>
+    </div>
+    <div class="form-control">
+      {% if form.rating.errors %}<p>{{ form.rating.errors }}</p>{% endif %}
+      <p>{{ form.rating.label_tag }} {{ form.rating }}</p>
+    </div>
+    <input type="submit" value="{% if update %}Update{% else %}Create{% endif %} Restaurant" />
+  </form>
+{% endblock %}

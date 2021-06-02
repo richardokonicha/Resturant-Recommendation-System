@@ -2,40 +2,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/nav.css' %}">
-    <script src="https://kit.fontawesome.com/b4eaa189da.js" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="{% static 'css/nav.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dish.css' %}">
+  <script src="https://kit.fontawesome.com/b4eaa189da.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
-    <nav class="navbar">
-        <span class="navbar-toggle" id="js-navbar-toggle">
-            <i class="fas fa-bars"></i>
-            <!-- <i class="fas fa-thumbs-up fa-5x"></i> -->
+  {% include "recommender/nav.html" %}
+  <div id="content">
+    {% block content %}
+    {% endblock %}
+  </div>
+  <div id="pagination">
+    {% block pagination %}
+      {% if is_paginated %}
+        <span class="step-links">
+          {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+          {% endif %}
+          <span class="current">
+              Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+          </span>
+          {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}">next</a>
+              <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+          {% endif %}
         </span>
-        <a href="#" class="logo"><img src="{% static 'img/amara.jpg' %}" alt="logo" class="profile-img"></a>
-        <ul class="main-nav" id="js-menu">
-            <li>
-                <a href="#" class="nav-link">Home</a>
-            </li>
-            <li>
-                <a href="#" class="nav-link">Menu</a>
-            </li>
-            <li>
-                <a href="#" class="nav-link">Orders</a>
-            </li>
-            <li>
-                <a href="#" class="nav-link">Products</a>
-            </li>
-            <li>
-                <a href="" class="nav-link">About</a>
-            </li>
-        </ul>
-    </nav>
-
-   
+      {% endif %}
+    {% endblock %}
+  </div>
 </body>
 
 <script>
