@@ -1,10 +1,12 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Restaurant(models.Model):
 
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
+    slug = models.CharField(max_length=200, blank=True, null=True)
     address = models.CharField(max_length=200)
     image_url = models.URLField("Image URL", max_length=350, null=True, blank=True)
     latitude = models.DecimalField(
@@ -20,7 +22,7 @@ class Restaurant(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=models.Q(rating__lte=5), name="restaurant_rating_lte_5"
-            )
+            ),
         ]
 
     def get_absolute_url(self):
@@ -34,6 +36,8 @@ class Restaurant(models.Model):
         if not (self.longitude and self.latitude):
             self.longitude = None
             self.latitude = None
+        # Create slug from name
+        self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
 

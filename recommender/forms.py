@@ -4,7 +4,7 @@ from django.core.validators import MinLengthValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
-from .models import Restaurant
+from .models import Restaurant, Dish
 
 RATING_CHOICES = [(x, str(x)) for x in range(1, 6)]
 
@@ -34,4 +34,11 @@ class RestaurantCreationForm(forms.ModelForm):
     class Meta:
         model = Restaurant
         fields = "__all__"
+        widgets = {"rating": forms.Select(choices=RATING_CHOICES)}
+
+
+class DishCreationForm(forms.ModelForm):
+    class Meta:
+        model = Dish
+        exclude = ("restaurant",)
         widgets = {"rating": forms.Select(choices=RATING_CHOICES)}
