@@ -15,4 +15,9 @@
       </p>
       <span>&#36;{{ dish.price }}</span>
   </div>
+  <p>
+    <a href="{% url 'recommender:dish-update' restaurant_id=dish.restaurant.id dish_id=dish.id %}">
+      Update Dish
+    </a>
+  </p>
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "recommender/index.html" %}
+{% load static %}
+
+{% block content %}
+  <h1>Delete Restaurant</h1>
+  <form method="post">
+    {% csrf_token %}
+    <h2>{{ restaurant.name }}</h2>
+    <p>
+      <img
+        width="400"
+        src="{% if restaurant.image_url %}{{ restaurant.image_url }}{% else %}{% static 'img/business.png' %}{% endif %}"
+      />
+    </p>
+    <p>Are you sure you want to delete "{{ restaurant.name }}"</p>
+    <input type="submit" value="Confirm Delete" />
+  </form>
+{% endblock %}
