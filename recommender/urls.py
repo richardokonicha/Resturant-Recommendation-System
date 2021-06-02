@@ -28,6 +28,11 @@ urlpatterns = [
         name="restaurant-delete",
     ),
     path(
+        "restaurant/<int:restaurant_id>/dishes/",
+        views.RestaurantDishList.as_view(),
+        name="restaurant-dish-list",
+    ),
+    path(
         "restaurant/<int:restaurant_id>/dish/create",
         views.DishCreateView.as_view(),
         name="dish-create",
@@ -41,5 +46,10 @@ urlpatterns = [
         "restaurant/<int:restaurant_id>/dish/<int:dish_id>/update/",
         views.DishUpdateView.as_view(),
         name="dish-update",
+    ),
+    path(
+        "restaurant/<int:restaurant_id>/dish/<int:dish_id>/delete/",
+        views.DishDeleteView.as_view(),
+        name="dish-delete",
     ),
 ]

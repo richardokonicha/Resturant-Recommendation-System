@@ -33,7 +33,7 @@ class SignUpForm(UserCreationForm):
 class RestaurantCreationForm(forms.ModelForm):
     class Meta:
         model = Restaurant
-        fields = "__all__"
+        exclude = ("slug",)
         widgets = {"rating": forms.Select(choices=RATING_CHOICES)}
 
 
