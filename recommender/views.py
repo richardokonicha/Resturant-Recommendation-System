@@ -5,8 +5,11 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .forms import SignUpForm, RestaurantCreationForm, DishCreationForm
 from .models import Restaurant, Dish
+from .permissions import IsStaffMixin
 
 
 def index(request):
@@ -30,27 +33,13 @@ def sign_up(request):
     return render(request, "recommender/sign_up.html", context={"form": form})
 
 
-class DishListView(generic.ListView):
-    model = Dish
-    context_object_name = "dishes"
-    template_name = "recommender/dish_list.html"
-    paginate_by = 10
-
-
-class DishDetailView(generic.DetailView):
-
-    model = Dish
-    context_object_name = "dish"
-    template_name = "recommender/dish_detail.html"
-
-
-class DishCreateView(CreateView):
+class DishCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
 
     form_class = DishCreationForm
     template_name = "recommender/dish_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["pk"])
+        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
@@ -63,7 +52,30 @@ class DishCreateView(CreateView):
         return super().form_valid(form)
 
 
-class DishUpdateView(UpdateView):
+class DishListView(generic.ListView):
+    model = Dish
+    context_object_name = "dishes"
+    template_name = "recommender/dish_list.html"
+    paginate_by = 10
+
+
+class DishDetailView(generic.DetailView):
+    def dispatch(self, request, *args, **kwargs):
+        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["restaurant"] = self.restaurant
+        return context
+
+    model = Dish
+    pk_url_kwarg = "dish_id"
+    context_object_name = "dish"
+    template_name = "recommender/dish_detail.html"
+
+
+class DishUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
 
     model = Dish
     pk_url_kwarg = "dish_id"
@@ -81,11 +93,36 @@ class DishUpdateView(UpdateView):
         return context
 
 
-class DishDeleteView(DeleteView):
+class DishDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
+    def dispatch(self, request, *args, **kwargs):
+        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
+        return super().dispatch(request, *args, **kwargs)
 
     model = Dish
+    pk_url_kwarg = "dish_id"
     template_name = "recommender/dish_confirm_delete.html"
-    success_url = reverse_lazy
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy(
+            "recommender:restaurant-dish-list",
+            kwargs={"restaurant_id": self.restaurant.id},
+        )
+
+
+class RestaurantDishList(generic.ListView):
+
+    template_name = "recommender/dish_list.html"
+    context_object_name = "dishes"
+
+    def get_queryset(self, *args, **kwargs):
+
+        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
+        return self.restaurant.dishes.all()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["restaurant"] = self.restaurant
+        return context
 
 
 class RestaurantListView(generic.ListView):
@@ -110,13 +147,15 @@ class RestaurantDetailView(generic.DetailView):
         return context
 
 
-class RestaurantCreateView(SuccessMessageMixin, CreateView):
+class RestaurantCreateView(
+    LoginRequiredMixin, IsStaffMixin, SuccessMessageMixin, CreateView
+):
     form_class = RestaurantCreationForm
     template_name = "recommender/restaurant_form.html"
     success_message = "Restaurant: %(name)s was created successfully."
 
 
-class RestaurantUpdateView(UpdateView):
+class RestaurantUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
     form_class = RestaurantCreationForm
     template_name = "recommender/restaurant_form.html"
     model = Restaurant
@@ -127,7 +166,7 @@ class RestaurantUpdateView(UpdateView):
         return context
 
 
-class RestaurantDeleteView(DeleteView):
+class RestaurantDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
     model = Restaurant
     template_name = "recommender/restaurant_confirm_delete.html"
     success_url = reverse_lazy("recommender:restaurants-list")
