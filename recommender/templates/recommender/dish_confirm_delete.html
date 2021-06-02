@@ -2,17 +2,17 @@
 {% load static %}
 
 {% block content %}
-  <h1>Delete Restaurant</h1>
+  <h1>Delete Dish</h1>
   <form method="post">
     {% csrf_token %}
-    <h2>{{ restaurant.name }}</h2>
+    <h2>{{ dish.name }}</h2>
     <p>
       <img
         width="400"
-        src="{% if restaurant.image_url %}{{ restaurant.image_url }}{% else %}{% static 'img/business.png' %}{% endif %}"
+        src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
       />
     </p>
-    <p>Are you sure you want to delete "{{ restaurant.name }}"</p>
+    <p>Are you sure you want to delete "{{ dish.name }}"</p>
     <input type="submit" value="Confirm Delete" />
   </form>
 {% endblock %}

@@ -61,7 +61,10 @@ class Dish(models.Model):
         ]
 
     def get_absolute_url(self):
-        return reverse("recommender:dish-detail", args=[str(self.id)])
+        return reverse(
+            "recommender:dish-detail",
+            kwargs={"restaurant_id": str(self.restaurant.id), "dish_id": str(self.id)},
+        )
 
     def __str__(self):
         return self.name
