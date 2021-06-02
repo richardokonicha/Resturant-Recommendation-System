@@ -18,6 +18,13 @@
         />
       </p>
   </div>
+  {% if request.user.is_superuser %}
+    <p>
+      <a href="{% url 'recommender:restaurant-update' pk=restaurant.id %}">Update</a>
+      <a href="{% url 'recommender:restaurant-delete' pk=restaurant.id %}">Delete</a>
+      <a href="{% url 'recommender:dish-create' pk=restaurant.id %}">Add Dish</a>
+    </p>
+  {% endif %}
   <hr>
   <h3>Top Dishes at {{ restaurant.name }}</h3>
   <div class="restaurant-dishes">
