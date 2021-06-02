@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from .models import Restaurant, Dish
 
-RATING_CHOICES = [(x, str(x)) for x in range(1, 6)]
+RATING_CHOICES = [(x, str(x) if x > 0 else "N/A") for x in range(0, 6)]
 
 
 class SignUpForm(UserCreationForm):

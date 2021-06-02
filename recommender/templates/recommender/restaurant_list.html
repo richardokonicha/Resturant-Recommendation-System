@@ -1,6 +1,11 @@
 {% extends "recommender/index.html" %}
 
 {% block content %}
+  {% if user.is_staff %}
+    <li>
+      <a href="{% url 'recommender:restaurant-create' %}">Add Restaurant</a>
+    </li>
+  {% endif %}
   {% if restaurants %}
     <table>
       <thead>
@@ -16,7 +21,7 @@
           <tr>
             <td>{{ restaurant.name }}</td>
             <td>{{ restaurant.address }}</td>
-            <td>{% if restaurant.rating %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
+            <td>{% if restaurant.rating > 0 %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
             <td><a href="{{ restaurant.get_absolute_url }}">Explore</a></td>
           </tr>
         {% endfor %}

@@ -6,7 +6,7 @@
     <span>
       From: <a href="{{ restaurant.get_absolute_url }}">{{ restaurant.name }}</a>
     </span><br />
-    <span>Rating: {% if dish.rating %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span>
+    <span>Rating: {% if dish.rating > 0 %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span>
       <p>
         <img
           width="500"
@@ -15,7 +15,7 @@
       </p>
       <span>&#36;{{ dish.price }}</span>
   </div>
-  {% if request.user.is_superuser %}
+  {% if user.is_staff %}
     <p>
       <a href="{% url 'recommender:dish-update' restaurant_id=dish.restaurant.id dish_id=dish.id %}">
         Update Dish
