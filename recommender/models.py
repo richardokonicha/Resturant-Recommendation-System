@@ -15,7 +15,7 @@ class Restaurant(models.Model):
     longitude = models.DecimalField(
         max_digits=8, decimal_places=5, null=True, blank=True
     )
-    rating = models.PositiveIntegerField(null=True, blank=True)
+    rating = models.PositiveIntegerField(null=True, blank=True, default=0)
 
     class Meta:
         ordering = ("name", "-rating")
@@ -48,7 +48,7 @@ class Dish(models.Model):
     )
     name = models.CharField("Dish name", max_length=200)
     price = models.DecimalField(decimal_places=2, max_digits=8)
-    rating = models.PositiveIntegerField(null=True, blank=True)
+    rating = models.PositiveIntegerField(null=True, blank=True, default=0)
     image_url = models.URLField("Image URL", max_length=350, null=True, blank=True)
 
     class Meta:

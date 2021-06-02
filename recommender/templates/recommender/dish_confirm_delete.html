@@ -14,5 +14,6 @@
     </p>
     <p>Are you sure you want to delete "{{ dish.name }}"</p>
     <input type="submit" value="Confirm Delete" />
+    <a href="{{ dish.get_absolute_url }}">Go back</a>
   </form>
 {% endblock %}

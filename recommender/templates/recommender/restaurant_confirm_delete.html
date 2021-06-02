@@ -14,5 +14,6 @@
     </p>
     <p>Are you sure you want to delete "{{ restaurant.name }}"</p>
     <input type="submit" value="Confirm Delete" />
+    <a href="{{ restaurant.get_absolute_url }}">Go back to {{ restaurant.name }}</a>
   </form>
 {% endblock %}
