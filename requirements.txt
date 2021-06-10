@@ -1,7 +1,7 @@
 aniso8601==7.0.0
 asgiref==3.2.3
 dj-database-url==0.5.0
-Django==3.0.4
+Django==3.1.12
 entrypoints==0.3
 flake8==3.7.9
 graphene==2.1.8
