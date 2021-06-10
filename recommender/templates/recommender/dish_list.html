@@ -1,7 +1,13 @@
 {% extends "recommender/index.html" %}
 {% load static %}
 {% block content %}
-  {% if dishes %}
+  {% if restaurant %}
+    <p>
+      <a href="{{ restaurant.get_absolute_url }}">{{ restaurant.name }}</a>
+    </p>
+  {% endif %}
+
+  {% if page_obj %}
     <table>
       <thead>
         <tr>
@@ -11,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for dish in dishes %}
+        {% for dish in page_obj %}
           <tr>
             <td>
               <a href="{{ dish.get_absolute_url }}">

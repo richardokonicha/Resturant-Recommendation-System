@@ -1,15 +1,18 @@
 {% extends "recommender/index.html" %}
 {% block content %}
+  {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+      <p>{{ error|escape }}</p>
+    {% endfor %}
+  {% endif %}
   <form method="POST" action="{% url 'login' %}">
     {% csrf_token %}
     <div class="form-control">
-      <p>{{ form.username.errors }}</p>
       <p>{{ form.username.label_tag }}
         {{ form.username }}
       </p>
     </div>
     <div class="form-control">
-      <p>{{ form.password.errors }}</p>
       <p>{{ form.password.label_tag }}
         {{ form.password }}
       </p>
