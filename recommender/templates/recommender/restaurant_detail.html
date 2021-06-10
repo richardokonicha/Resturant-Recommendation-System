@@ -10,7 +10,7 @@
           {{ restaurant.latitude }}, {{ restaurant.longitude }}
         {% endif %}
     </span><br />
-    <span>Rating: {% if restaurant.rating %}{{ restaurant.rating }} of 5{% else %}N/A{% endif %}</span>
+    <span>Rating: {% if restaurant.rating > 0 %}{{ restaurant.rating }} of 5{% else %}N/A{% endif %}</span>
       <p>
         <img
           width="400"
@@ -18,8 +18,22 @@
         />
       </p>
   </div>
+  {% if user.is_staff %}
+    <p>
+      <a href="{% url 'recommender:restaurant-update' restaurant.id %}">Update</a>
+      <a href="{% url 'recommender:restaurant-delete' restaurant.id %}">Delete</a>
+      <a href="{% url 'recommender:dish-create' restaurant.id %}">Add Dish</a>
+    </p>
+  {% endif %}
   <hr>
   <h3>Top Dishes at {{ restaurant.name }}</h3>
+  {% if restaurant.dishes.count %}
+    <p>
+      <a href="{% url 'recommender:restaurant-dish-list' restaurant.id %}">
+        See all dishes by {{ restaurant.name }}
+      </a>
+    </p>
+  {% endif %}
   <div class="restaurant-dishes">
     {% for dish in highest_rated_dishes %}
       <div>
@@ -29,13 +43,16 @@
             src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
           /><br />
           {{ dish.name }}<br />
-          <span>Rating: {% if dish.rating %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span><br />
+          <span>Rating: {% if dish.rating > 0 %}{{ dish.rating }} of 5{% else %}N/A{% endif %}</span><br />
           <span>&#36;{{ dish.price }}</span>
         </a>
       </div>
       {% empty %}
         <p>
           No dishes yet for {{ restaurant.name }}.
+        </p>
+        <p>
+          <a href="{% url 'recommender:dish-create' restaurant.id %}">Add Dish</a>
         </p>
     {% endfor %}
   </div>
