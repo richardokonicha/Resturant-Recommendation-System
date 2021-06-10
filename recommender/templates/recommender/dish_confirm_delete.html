@@ -1,0 +1,19 @@
+{% extends "recommender/index.html" %}
+{% load static %}
+
+{% block content %}
+  <h1>Delete Dish</h1>
+  <form method="post">
+    {% csrf_token %}
+    <h2>{{ dish.name }}</h2>
+    <p>
+      <img
+        width="400"
+        src="{% if dish.image_url %}{{ dish.image_url }}{% else %}{% static 'img/pizza.jpg' %}{% endif %}"
+      />
+    </p>
+    <p>Are you sure you want to delete "{{ dish.name }}"</p>
+    <input type="submit" value="Confirm Delete" />
+    <a href="{{ dish.get_absolute_url }}">Go back</a>
+  </form>
+{% endblock %}

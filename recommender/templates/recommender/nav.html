@@ -19,6 +19,9 @@
             <a href="{% url 'recommender:dishes-list' %}" class="nav-link">Products</a>
         </li>
         <li>
+            <a href="{% url 'recommender:restaurants-list' %}" class="nav-link">Restaurants</a>
+        </li>
+        <li>
             <a href="" class="nav-link">About</a>
         </li>
         {% if user.is_authenticated %}
