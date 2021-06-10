@@ -1,6 +1,2 @@
-from django.contrib.auth.mixins import UserPassesTestMixin
-
-
-class IsStaffMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.is_staff
+def is_staff(user):
+    return user.is_staff

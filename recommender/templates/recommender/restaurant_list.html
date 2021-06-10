@@ -1,12 +1,12 @@
 {% extends "recommender/index.html" %}
-
+{% load static %}
 {% block content %}
   {% if user.is_staff %}
     <li>
       <a href="{% url 'recommender:restaurant-create' %}">Add Restaurant</a>
     </li>
   {% endif %}
-  {% if restaurants %}
+  {% if page_obj %}
     <table>
       <thead>
         <tr>
@@ -17,9 +17,16 @@
         </tr>
       </thead>
       <tbody>
-        {% for restaurant in restaurants %}
+        {% for restaurant in page_obj %}
           <tr>
-            <td>{{ restaurant.name }}</td>
+            <td>
+              <a href="{{ restaurant.get_absolute_url }}">
+                <img
+                  height="50"
+                  src="{% if restaurant.image_url %}{{ restaurant.image_url }}{% else %}{% static 'img/business.png' %}{% endif %}"
+                />
+                <span>{{ restaurant.name }}</span>
+            </td>
             <td>{{ restaurant.address }}</td>
             <td>{% if restaurant.rating > 0 %}{{ restaurant.rating }}{% else %}N/A{% endif %}</td>
             <td><a href="{{ restaurant.get_absolute_url }}">Explore</a></td>

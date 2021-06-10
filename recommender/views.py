@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login, logout
-from django.views import generic
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.urls.base import reverse
+from django.core.paginator import Paginator
 
 from .forms import SignUpForm, RestaurantCreationForm, DishCreationForm
 from .models import Restaurant, Dish
-from .permissions import IsStaffMixin
+from .permissions import is_staff
+
+PAGINATE_COUNT = 10  # Number of items to show on a page
 
 
 def index(request):
@@ -33,141 +33,186 @@ def sign_up(request):
     return render(request, "recommender/sign_up.html", context={"form": form})
 
 
-class DishCreateView(LoginRequiredMixin, IsStaffMixin, CreateView):
+def dish_list(request):
+    dishes = Dish.objects.all()
+    paginator = Paginator(dishes, PAGINATE_COUNT)
 
-    form_class = DishCreationForm
-    template_name = "recommender/dish_form.html"
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-    def dispatch(self, request, *args, **kwargs):
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["restaurant"] = self.restaurant
-        return context
-
-    def form_valid(self, form):
-        form.instance.restaurant = self.restaurant
-        return super().form_valid(form)
+    return render(
+        request,
+        "recommender/dish_list.html",
+        {"page_obj": page_obj},
+    )
 
 
-class DishListView(generic.ListView):
-    model = Dish
-    context_object_name = "dishes"
-    template_name = "recommender/dish_list.html"
-    paginate_by = 10
+def restaurant_dish_list(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    dishes = restaurant.dishes.all()
+
+    paginator = Paginator(dishes, PAGINATE_COUNT)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(
+        request,
+        "recommender/dish_list.html",
+        context={
+            "restaurant": restaurant,
+            "page_obj": page_obj,
+            "restaurant": restaurant,
+        },
+    )
 
 
-class DishDetailView(generic.DetailView):
-    def dispatch(self, request, *args, **kwargs):
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
-        return super().dispatch(request, *args, **kwargs)
+@login_required
+@user_passes_test(is_staff)
+def dish_create(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["restaurant"] = self.restaurant
-        return context
-
-    model = Dish
-    pk_url_kwarg = "dish_id"
-    context_object_name = "dish"
-    template_name = "recommender/dish_detail.html"
-
-
-class DishUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
-
-    model = Dish
-    pk_url_kwarg = "dish_id"
-    form_class = DishCreationForm
-    template_name = "recommender/dish_form.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["restaurant"] = self.restaurant
-        context["update"] = True
-        return context
+    if request.method == "POST":
+        form = DishCreationForm(request.POST)
+        if form.is_valid():
+            # Temporarily save the object and register its restaurant
+            dish = form.save(commit=False)
+            dish.restaurant = restaurant
+            dish.save()
+            return redirect(
+                "recommender:dish-detail", restaurant_id=restaurant.id, dish_id=dish.id
+            )
+    else:
+        form = DishCreationForm()
+    return render(
+        request,
+        "recommender/dish_form.html",
+        context={"restaurant": restaurant, "form": form, "update": False},
+    )
 
 
-class DishDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
-    def dispatch(self, request, *args, **kwargs):
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
-        return super().dispatch(request, *args, **kwargs)
+def dish_detail(request, restaurant_id, dish_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    dish = get_object_or_404(Dish, id=dish_id)
+    return render(
+        request,
+        "recommender/dish_detail.html",
+        context={"restaurant": restaurant, "dish": dish},
+    )
 
-    model = Dish
-    pk_url_kwarg = "dish_id"
-    template_name = "recommender/dish_confirm_delete.html"
 
-    def get_success_url(self, *args, **kwargs):
-        return reverse_lazy(
-            "recommender:restaurant-dish-list",
-            kwargs={"restaurant_id": self.restaurant.id},
+@login_required
+@user_passes_test(is_staff)
+def dish_update(request, restaurant_id, dish_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    dish = get_object_or_404(Dish, id=dish_id)
+
+    if request.method == "POST":
+        form = DishCreationForm(request.POST, instance=dish)
+        if form.is_valid():
+            dish = form.save()
+            return redirect(dish)
+    else:
+        form = DishCreationForm(instance=dish)
+    return render(
+        request,
+        "recommender/dish_form.html",
+        {"restaurant": restaurant, "form": form, "update": True, "dish": dish},
+    )
+
+
+@login_required
+@user_passes_test(is_staff)
+def dish_delete(request, restaurant_id, dish_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    dish = get_object_or_404(Dish, id=dish_id)
+    if request.method == "POST":
+        dish.delete()
+        return redirect("recommender:restaurant-dish-list", restaurant_id=restaurant.id)
+    else:
+        return render(
+            request,
+            "recommender/dish_confirm_delete.html",
+            context={"dish": dish},
         )
 
 
-class RestaurantDishList(generic.ListView):
+def restaurant_list(request):
+    restaurants = Restaurant.objects.all()
+    paginator = Paginator(restaurants, PAGINATE_COUNT)
 
-    template_name = "recommender/dish_list.html"
-    context_object_name = "dishes"
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
-    def get_queryset(self, *args, **kwargs):
-
-        self.restaurant = get_object_or_404(Restaurant, pk=self.kwargs["restaurant_id"])
-        return self.restaurant.dishes.all()
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["restaurant"] = self.restaurant
-        return context
+    return render(
+        request,
+        "recommender/restaurant_list.html",
+        {"page_obj": page_obj},
+    )
 
 
-class RestaurantListView(generic.ListView):
+@login_required
+@user_passes_test(is_staff)
+def restaurant_create(request):
 
-    paginate_by = 10
-    model = Restaurant
-    template_name = "recommender/restaurant_list.html"
-    context_object_name = "restaurants"
-
-
-class RestaurantDetailView(generic.DetailView):
-
-    model = Restaurant
-    template_name = "recommender/restaurant_detail.html"
-    context_object_name = "restaurant"
-
-    def get_context_data(self, *args, **kwargs):
-        # Retrieve the restaurants top 5 dishes based on rating
-        context = super().get_context_data(*args, **kwargs)
-        highest_rated_dishes = self.get_object().dishes.order_by("-rating")[:5]
-        context["highest_rated_dishes"] = highest_rated_dishes
-        return context
+    if request.method == "POST":
+        form = RestaurantCreationForm(request.POST)
+        if form.is_valid():
+            restaurant = form.save()
+            return redirect(restaurant)
+    else:
+        form = RestaurantCreationForm()
+    return render(
+        request,
+        "recommender/restaurant_form.html",
+        context={"form": form, "update": False},
+    )
 
 
-class RestaurantCreateView(
-    LoginRequiredMixin, IsStaffMixin, SuccessMessageMixin, CreateView
-):
-    form_class = RestaurantCreationForm
-    template_name = "recommender/restaurant_form.html"
-    success_message = "Restaurant: %(name)s was created successfully."
+def restaurant_detail(request, restaurant_id):
+
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    # Get the 5 highest rated dishes by the restaurant
+    highest_rated_dishes = restaurant.dishes.order_by("-rating")[:5]
+
+    return render(
+        request,
+        "recommender/restaurant_detail.html",
+        context={
+            "restaurant": restaurant,
+            "highest_rated_dishes": highest_rated_dishes,
+        },
+    )
 
 
-class RestaurantUpdateView(LoginRequiredMixin, IsStaffMixin, UpdateView):
-    form_class = RestaurantCreationForm
-    template_name = "recommender/restaurant_form.html"
-    model = Restaurant
+@login_required
+@user_passes_test(is_staff)
+def restaurant_update(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    if request.method == "POST":
+        form = RestaurantCreationForm(request.POST, instance=restaurant)
+        if form.is_valid():
+            restaurant = form.save()
+            return redirect(restaurant)
+    else:
+        form = RestaurantCreationForm(instance=restaurant)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["update"] = True
-        return context
+    return render(
+        request,
+        "recommender/restaurant_form.html",
+        context={"form": form, "update": True, "restaurant": restaurant},
+    )
 
 
-class RestaurantDeleteView(LoginRequiredMixin, IsStaffMixin, DeleteView):
-    model = Restaurant
-    template_name = "recommender/restaurant_confirm_delete.html"
-    success_url = reverse_lazy("recommender:restaurants-list")
-    context_object_name = "restaurant"
+@login_required
+@user_passes_test(is_staff)
+def restaurant_delete(request, restaurant_id):
+    restaurant = get_object_or_404(Restaurant, id=restaurant_id)
+    if request.method == "POST":
+        restaurant.delete()
+        return redirect("recommender:restaurants-list")
+    else:
+        return render(
+            request,
+            "recommender/restaurant_confirm_delete.html",
+            context={"restaurnat": restaurant},
+        )
