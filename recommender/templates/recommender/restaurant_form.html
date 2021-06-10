@@ -27,4 +27,7 @@
     </div>
     <input type="submit" value="{% if update %}Update{% else %}Create{% endif %} Restaurant" />
   </form>
+  {% if update %}
+    <a href="{{ restaurant.get_absolute_url }}">Go back</a>
+  {% endif %}
 {% endblock %}

@@ -22,5 +22,8 @@
       <p>{{ form.rating.label_tag }} {{ form.rating }}</p>
     </div>
     <input type="submit" value="{% if update %}Update{% else %}Add{% endif %} Dish" />
+    {% if update %}
+      <a href="{{ dish.get_absolute_url }}">Go back</a>
+    {% endif %}
   </form>
 {% endblock %}
