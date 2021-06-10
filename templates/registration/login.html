@@ -5,6 +5,18 @@
       <p>{{ error|escape }}</p>
     {% endfor %}
   {% endif %}
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p>
+        You are authenticated as "{{ user.get_username }}", but are not authorized
+        to access this page. Would you like to login to a different account?
+      </p>
+    {% else %}
+      <p>
+        Please login to view this page.
+      </p>
+    {% endif %}
+  {% endif %}
   <form method="POST" action="{% url 'login' %}">
     {% csrf_token %}
     <div class="form-control">
